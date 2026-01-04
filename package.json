@@ -1,9 +1,11 @@
 {
-  "name": "tauri-app",
+  "name": "iptv-explorer",
   "private": true,
   "version": "0.0.3",
   "type": "module",
   "scripts": {
+    "dev": "tauri dev",
+    "build": "rm -rf build && CARGO_TARGET_DIR=${PWD}/build tauri build",
     "tauri": "tauri"
   },
   "devDependencies": {

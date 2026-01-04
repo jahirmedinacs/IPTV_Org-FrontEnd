@@ -263,20 +263,116 @@ function openModal(channel) {
       els.video.play().catch(e => console.log("Auto-play prevenido por navegador"));
     });
     state.hls.on(Hls.Events.ERROR, (event, data) => {
+      const errorDetails = `Tipo: ${data.type}\nDetalle: ${data.details}\nFatal: ${data.fatal}`;
+      console.error("HLS ERROR EVENT:", data);
+
       if (data.fatal) {
-        showPlayerError();
+        switch (data.type) {
+          case Hls.ErrorTypes.NETWORK_ERROR:
+            alert(`Error Fatal de Red:\n${errorDetails}\nIntentando recuperar...`);
+            console.log("Intentando recuperar error de red...");
+            state.hls.startLoad();
+            break;
+          case Hls.ErrorTypes.MEDIA_ERROR:
+            alert(`Error Fatal de Media (Posible Codec/Decoding):\n${errorDetails}\nIntentando recuperar...`);
+            console.log("Intentando recuperar error de media...");
+            state.hls.recoverMediaError();
+            break;
+          default:
+            // Fallback a reproducción Nativa si HLS.js falla
+            state.hls.destroy();
+            console.warn("HLS.js falló fatalmente. Intentando reproducción nativa (GStreamer/Safari)...");
+            els.video.src = channel.streamUrl;
+            els.video.play().catch(e => {
+              const msg = `Fallo total (HLS.js y Nativo).\n${errorDetails}\nError Nativo: ${e.message}`;
+              alert(msg);
+              showPlayerError(msg);
+            });
+            break;
+        }
+      } else {
+        // Errores no fatales pero informativos
+        console.warn("HLS Warning:", errorDetails);
       }
     });
-  } else if (els.video.canPlayType('application/vnd.apple.mpegurl')) {
-    // Para Safari nativo
+  } else if (els.video.canPlayType('application/vnd.apple.mpegurl') || els.video.canPlayType('application/x-mpegURL')) {
+    // Para Safari nativo o WebKitGTK con GStreamer (tu solución)
+    console.log("Detectado soporte nativo HLS. Usando <video> tag directamente.");
     els.video.src = channel.streamUrl;
     els.video.addEventListener('loadedmetadata', () => {
       els.video.play();
     });
-    els.video.addEventListener('error', showPlayerError);
+    els.video.addEventListener('error', (e) => {
+      const err = els.video.error;
+      const msg = `Error Nativo Video: Code ${err ? err.code : 'Desconocido'}\nMensaje: ${err ? err.message : ''}`;
+      console.error(msg);
+      showPlayerError(msg);
+    });
   } else {
-    alert("Tu navegador no soporta HLS. MSE: " + (window.MediaSource ? "Disponible" : "No Disponible"));
+    // Diagnóstico profundo v2
+    const mimeMap = {
+      'H264 (MP4)': 'video/mp4; codecs="avc1.42E01E,mp4a.40.2"',
+      'VP9 (WebM)': 'video/webm; codecs="vp9,vorbis"',
+      'VP8 (WebM)': 'video/webm; codecs="vp8,vorbis"'
+    };
+
+    let codecSupport = "";
+    if (window.MediaSource && typeof window.MediaSource.isTypeSupported === 'function') {
+      for (const [label, mime] of Object.entries(mimeMap)) {
+        codecSupport += `\n   - ${label}: ${window.MediaSource.isTypeSupported(mime)}`;
+      }
+    } else {
+      codecSupport = "N/A (MSE no disponible)";
+    }
+
+    const checks = {
+      windowHls: !!window.Hls,
+      MediaSource: !!window.MediaSource,
+      SourceBuffer: !!(window.SourceBuffer || window.WebKitSourceBuffer),
+    };
+
+    // Modificación Crítica: Si fallan los checks, intentar forzar la reproducción nativa con <source> tag explícito
+    // Esto alinea con la solución que sugiere usar <source type="application/x-mpegURL"> para activar GStreamer
+    console.warn("Checks de soporte fallaron. Intentando reproducción nativa forzada via <source> tag...");
+
+    const tryForcedPlayback = () => {
+      // Limpiar fuentes anteriores
+      els.video.innerHTML = '';
+      els.video.removeAttribute('src'); // Limpiar atributo src si existía
+
+      // Crear elemento source explícito
+      const source = document.createElement('source');
+      source.src = channel.streamUrl;
+      source.type = "application/x-mpegURL";
+
+      els.video.appendChild(source);
+      els.video.load(); // Importante: recargar el elemento video al cambiar sources hijos
+
+      const playPromise = els.video.play();
+      if (playPromise !== undefined) {
+        playPromise.catch(e => {
+          // Ahora sí, si falla el forzado, mostramos el diagnóstico
+          showDiagnosticError(codecSupport, checks);
+        });
+      }
+    };
+
+    // Escuchar error en este intento forzado
+    const errorHandler = (e) => {
+      els.video.removeEventListener('error', errorHandler);
+      showDiagnosticError(codecSupport, checks);
+    };
+    els.video.addEventListener('error', errorHandler);
+
+    tryForcedPlayback();
   }
+}
+
+function showDiagnosticError(codecSupport, checks) {
+  const msg = `HLS no soportado (Ni Hls.js, Ni Nativo <source>).\n\nDiagnostico:\n1. Librerias:\n   - Hls.js Loaded: ${checks.windowHls}\n2. APIs Navegador:\n   - MSE: ${checks.MediaSource}\n   - SourceBuffer: ${checks.SourceBuffer}\n3. Protocolo: ${window.location.protocol}\n4. Codec Checks:${codecSupport}`;
+  alert(msg);
+  console.error(msg);
+  showPlayerError(msg);
 }
 
 // Exposed to global scope for HTML onclick access if needed (though we attached events via JS)
