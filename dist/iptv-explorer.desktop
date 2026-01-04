@@ -1,0 +1,9 @@
+[Desktop Entry]
+Categories=AudioVideo;Video;TV;
+Comment=IPTV Explorer App
+Exec=iptv-explorer %U
+Icon=iptv-explorer
+Name=IPTV Explorer
+Terminal=false
+Type=Application
+MimeType=x-scheme-handler/iptv-explorer;

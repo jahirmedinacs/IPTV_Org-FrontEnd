@@ -1,0 +1,28 @@
+# Maintainer: Jahir Medina <jahirmedinacs@gmail.com>
+pkgname=iptv-explorer-bin
+pkgver=0.0.3
+pkgrel=1
+pkgdesc="IPTV Explorer Application (Tauri V2)"
+arch=('x86_64')
+url="https://github.com/jahirmedinacs/IPTV_Org-FrontEnd"
+license=('MIT')
+depends=('webkit2gtk' 'gtk3' 'openssl' 'gstreamer' 'gst-plugins-base' 'gst-plugins-good' 'gst-plugins-bad' 'gst-plugins-ugly' 'gst-libav')
+provides=('iptv-explorer')
+conflicts=('iptv-explorer')
+source=("iptv-explorer::file://${startdir}/../build/release/iptv-explorer"
+        "iptv-explorer.desktop::file://${startdir}/iptv-explorer.desktop"
+        "iptv-explorer-icon.png::file://${startdir}/../src-tauri/icons/128x128.png")
+sha256sums=('SKIP'
+            'SKIP'
+            'SKIP')
+
+package() {
+    # Install Binary
+    install -Dm755 "${srcdir}/iptv-explorer" "${pkgdir}/usr/bin/iptv-explorer"
+
+    # Install Desktop File
+    install -Dm644 "${srcdir}/iptv-explorer.desktop" "${pkgdir}/usr/share/applications/iptv-explorer.desktop"
+
+    # Install Icon
+    install -Dm644 "${srcdir}/iptv-explorer-icon.png" "${pkgdir}/usr/share/icons/hicolor/128x128/apps/iptv-explorer.png"
+}
