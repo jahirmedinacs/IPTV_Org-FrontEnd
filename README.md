@@ -1,5 +1,7 @@
 # IPTV Explorer
 
+[![Release](https://github.com/jahirmedinacs/IPTV_Org-FrontEnd/actions/workflows/release.yml/badge.svg?branch=main&event=release)](https://github.com/jahirmedinacs/IPTV_Org-FrontEnd/actions/workflows/release.yml)
+
 **IPTV Explorer** is a fast, robust, and simple desktop application for browsing and playing IPTV channels from around the world. Built with [Tauri](https://tauri.app/) (v2) and Vanilla JavaScript, it offers a lightweight and secure way to explore global media.
 
 ![IPTV Explorer](https://ui-avatars.com/api/?name=IPTV+Explorer&background=0f172a&color=fff&size=512)
