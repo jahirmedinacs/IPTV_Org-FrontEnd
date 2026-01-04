@@ -3531,8 +3531,8 @@ dependencies = [
 ]
 
 [[package]]
-name = "tauri-app"
-version = "0.0.2"
+name = "tauri-appiptv-explorer"
+version = "0.1.0"
 dependencies = [
  "serde",
  "serde_json",

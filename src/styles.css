@@ -1,6 +1,8 @@
 body {
-    background-color: #0f172a; /* Slate 900 */
-    color: #e2e8f0; /* Slate 200 */
+    background-color: #0f172a;
+    /* Slate 900 */
+    color: #e2e8f0;
+    /* Slate 200 */
 }
 
 /* Custom Scrollbar */
@@ -8,20 +10,24 @@ body {
     width: 8px;
     height: 8px;
 }
+
 ::-webkit-scrollbar-track {
-    background: #1e293b; 
+    background: #1e293b;
 }
+
 ::-webkit-scrollbar-thumb {
-    background: #475569; 
+    background: #475569;
     border-radius: 4px;
 }
+
 ::-webkit-scrollbar-thumb:hover {
-    background: #64748b; 
+    background: #64748b;
 }
 
 .channel-card {
     transition: transform 0.2s, box-shadow 0.2s;
 }
+
 .channel-card:hover {
     transform: translateY(-4px);
     box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.5);
@@ -37,8 +43,13 @@ body {
 }
 
 @keyframes spin {
-    0% { transform: rotate(0deg); }
-    100% { transform: rotate(360deg); }
+    0% {
+        transform: rotate(0deg);
+    }
+
+    100% {
+        transform: rotate(360deg);
+    }
 }
 
 /* Aspect Ratio for Logos */

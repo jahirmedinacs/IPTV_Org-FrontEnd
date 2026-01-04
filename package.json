@@ -1,10 +1,11 @@
 {
-  "name": "tauri-app",
+  "name": "tauri-appiptv-explorer",
   "private": true,
-  "version": "0.0.3",
+  "version": "0.1.0",
   "type": "module",
   "scripts": {
-    "tauri": "tauri"
+    "tauri": "tauri",
+    "build": "CARGO_TARGET_DIR=build tauri build"
   },
   "devDependencies": {
     "@tauri-apps/cli": "^2"
