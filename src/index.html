@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>IPTV ORG Explorer</title>
+
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <!-- HLS.js para reproducir streams m3u8 -->
+  <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
+
+  <!-- Iconos -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+
+  <!-- Custom Styles -->
+  <link rel="stylesheet" href="styles.css">
+
+  <!-- App Logic -->
+  <script type="module" src="main.js" defer></script>
+</head>
+
+<body class="h-screen flex flex-col overflow-hidden">
+
+  <!-- Header & Filters -->
+  <header class="bg-slate-800 border-b border-slate-700 p-4 shadow-lg z-10">
+    <div class="flex flex-col md:flex-row justify-between items-center gap-4 max-w-7xl mx-auto">
+      <div class="flex items-center gap-3">
+        <i class="fas fa-tv text-blue-500 text-2xl"></i>
+        <h1 class="text-xl font-bold text-white tracking-wide">IPTV <span class="text-blue-400">ORG</span></h1>
+        <span id="channel-count" class="text-xs bg-slate-700 px-2 py-1 rounded text-slate-400">Cargando...</span>
+      </div>
+
+      <div class="flex flex-wrap gap-2 w-full md:w-auto">
+        <!-- Search -->
+        <div class="relative flex-grow md:flex-grow-0">
+          <i class="fas fa-search absolute left-3 top-1/2 transform -translate-y-1/2 text-slate-400"></i>
+          <input type="text" id="search-input" placeholder="Buscar canal..."
+            class="w-full md:w-64 bg-slate-700 border border-slate-600 text-white pl-10 pr-4 py-2 rounded focus:outline-none focus:border-blue-500 transition-colors">
+        </div>
+
+        <!-- Country Filter -->
+        <select id="country-select"
+          class="bg-slate-700 border border-slate-600 text-white px-4 py-2 rounded focus:outline-none focus:border-blue-500 max-w-[150px]">
+          <option value="all">Todos los Países</option>
+        </select>
+
+        <!-- Category Filter -->
+        <select id="category-select"
+          class="bg-slate-700 border border-slate-600 text-white px-4 py-2 rounded focus:outline-none focus:border-blue-500 max-w-[150px]">
+          <option value="all">Todas las Categorías</option>
+        </select>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Content -->
+  <main class="flex-1 overflow-y-auto p-6 relative" id="main-container">
+
+    <!-- Loading State -->
+    <div id="loading-indicator" class="absolute inset-0 flex flex-col items-center justify-center bg-slate-900 z-50">
+      <div class="loader mb-4"></div>
+      <p class="text-slate-400 animate-pulse">Descargando y procesando datos mundiales...</p>
+      <p class="text-xs text-slate-600 mt-2">Esto puede tomar unos segundos</p>
+    </div>
+
+    <!-- Grid -->
+    <div id="channels-grid"
+      class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6 max-w-7xl mx-auto hidden">
+      <!-- Cards injected via JS -->
+    </div>
+
+    <!-- No Results -->
+    <div id="no-results" class="hidden flex flex-col items-center justify-center mt-20 text-slate-500">
+      <i class="fas fa-ghost text-4xl mb-4"></i>
+      <p>No se encontraron canales con esos filtros.</p>
+    </div>
+
+    <!-- Load More Trigger -->
+    <div id="load-more-trigger" class="h-20 w-full"></div>
+  </main>
+
+  <!-- Video Modal -->
+  <div id="video-modal"
+    class="fixed inset-0 bg-black/90 z-50 hidden flex items-center justify-center backdrop-blur-sm opacity-0 transition-opacity duration-300">
+    <div class="bg-slate-800 rounded-lg overflow-hidden shadow-2xl w-full max-w-5xl mx-4 relative flex flex-col">
+
+      <!-- Modal Header -->
+      <div class="flex justify-between items-center p-4 bg-slate-900 border-b border-slate-700">
+        <h3 id="modal-title" class="text-lg font-bold text-white truncate pr-4">Nombre del Canal</h3>
+        <button onclick="closeModal()" class="text-slate-400 hover:text-white transition-colors">
+          <i class="fas fa-times text-xl"></i>
+        </button>
+      </div>
+
+      <!-- Player Container -->
+      <div class="relative w-full aspect-video bg-black">
+        <video id="video-player" controls class="w-full h-full object-contain"></video>
+        <div id="player-error" class="absolute inset-0 flex items-center justify-center bg-black/80 text-white hidden">
+          <div class="text-center p-4">
+            <i class="fas fa-exclamation-triangle text-yellow-500 text-3xl mb-2"></i>
+            <p>Error al cargar el stream.</p>
+            <p class="text-xs text-gray-400 mt-1">Puede que el canal esté offline o tenga restricciones geográficas.</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Modal Footer -->
+      <div class="p-4 bg-slate-900 text-sm text-slate-400 flex justify-between">
+        <span id="modal-info">Info del stream</span>
+        <button onclick="copyLink()" class="hover:text-blue-400 flex items-center gap-2">
+          <i class="fas fa-link"></i> Copiar URL
+        </button>
+      </div>
+    </div>
+  </div>
+</body>
+
+</html>
