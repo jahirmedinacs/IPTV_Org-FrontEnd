@@ -275,7 +275,7 @@ function openModal(channel) {
     });
     els.video.addEventListener('error', showPlayerError);
   } else {
-    alert("Tu navegador no soporta HLS.");
+    alert("Tu navegador no soporta HLS. MSE: " + (window.MediaSource ? "Disponible" : "No Disponible"));
   }
 }
 
